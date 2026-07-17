@@ -2090,7 +2090,7 @@ button:disabled {
   }
 
   .poker-table {
-    width: 86%;
+    width: 82%;
   }
 
   .poker-table__rail {
@@ -2101,8 +2101,12 @@ button:disabled {
     inset: 12px;
   }
 
+  .poker-table__felt {
+    overflow: visible;
+  }
+
   .poker-stage .player-seat:not(.player-seat--viewer) {
-    width: 100px;
+    width: 96px;
   }
 
   .poker-stage .player-seat:not(.player-seat--viewer) .player-avatar {
@@ -2120,7 +2124,7 @@ button:disabled {
   }
 
   .player-seat--viewer {
-    width: 185px;
+    width: 178px;
   }
 
   .player-seat--viewer .player-seat__panel {
@@ -2128,28 +2132,28 @@ button:disabled {
   }
 
   .dealer-announcement {
-    top: 4%;
-    width: 82%;
-    min-height: 42px;
-    padding: 5px 8px;
-    border-radius: 9px;
-    grid-template-columns: 26px minmax(0, 1fr);
-    gap: 6px;
+    top: -42%;
+    width: min(70%, 360px);
+    min-height: 40px;
+    padding: 4px 7px;
+    border-radius: 8px;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 5px;
   }
 
   .dealer-announcement__mark {
-    width: 24px;
-    height: 24px;
-    font-size: 12px;
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
   }
 
   .dealer-announcement__copy > span {
     margin-bottom: 1px;
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .dealer-announcement__copy strong {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .dealer-announcement__copy p {
