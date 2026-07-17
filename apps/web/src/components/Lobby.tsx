@@ -31,11 +31,13 @@ export function Lobby() {
   const [nickname, setNickname] = useState(() => globalThis.localStorage?.getItem("river-noir-nickname") ?? "");
   const [totalPlayers, setTotalPlayers] = useState(6);
   const [difficulty, setDifficulty] = useState<AiDifficulty>("standard");
+  const [deepSeekEnabled, setDeepSeekEnabled] = useState(false);
   const [initialStack, setInitialStack] = useState(10_000);
   const [blindIndex, setBlindIndex] = useState(1);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [analysisEnabled, setAnalysisEnabled] = useState(true);
   const t = (key: Parameters<typeof translate>[1], values?: Record<string, string | number>) => translate(locale, key, values);
+  const deepSeekAvailable = import.meta.env.VITE_DEEPSEEK_ENABLED === "true";
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -47,6 +49,7 @@ export function Lobby() {
       nickname: cleanNickname,
       totalPlayers,
       difficulty,
+      deepSeekEnabled: mode === "local" && deepSeekEnabled && deepSeekAvailable,
       initialStack,
       smallBlind: blinds.small,
       bigBlind: blinds.big,
@@ -139,6 +142,25 @@ export function Lobby() {
                 ))}
               </div>
             </div>
+
+            {mode === "local" && (
+              <div className="field">
+                <span>{t("aiEngine")}</span>
+                <div className="segmented-control segmented-control--two">
+                  <button type="button" className={!deepSeekEnabled ? "is-selected" : ""} onClick={() => setDeepSeekEnabled(false)}>{t("localAi")}</button>
+                  <button
+                    type="button"
+                    className={deepSeekEnabled ? "is-selected" : ""}
+                    disabled={!deepSeekAvailable}
+                    title={!deepSeekAvailable ? t("deepSeekUnavailable") : undefined}
+                    onClick={() => setDeepSeekEnabled(true)}
+                  >
+                    DeepSeek
+                  </button>
+                </div>
+                {!deepSeekAvailable && <small className="field__hint">{t("deepSeekUnavailable")}</small>}
+              </div>
+            )}
 
             <div className="setup-row">
               <div className="field">

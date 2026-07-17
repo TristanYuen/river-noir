@@ -1,0 +1,5 @@
+{
+  "buildCommand": "npm run build --workspace @river-noir/web",
+  "outputDirectory": "apps/web/dist",
+  "framework": "vite"
+}

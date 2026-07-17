@@ -487,6 +487,16 @@ button:disabled {
   grid-template-columns: repeat(3, 1fr);
 }
 
+.segmented-control--two {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.field__hint {
+  color: #66736c;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .setup-row {
   display: flex;
   gap: 12px;
@@ -581,9 +591,11 @@ button:disabled {
 
 /* Table */
 .table-page {
+  display: grid;
   height: 100dvh;
   min-height: 620px;
   overflow: hidden;
+  grid-template-rows: auto minmax(0, 1fr);
   background:
     radial-gradient(ellipse at 42% 35%, rgba(29, 76, 55, 0.16), transparent 48%),
     linear-gradient(145deg, #050806, #080d0a 55%, #030504);
@@ -592,6 +604,7 @@ button:disabled {
 .table-page--loading {
   display: grid;
   place-items: center;
+  grid-template-rows: 1fr;
 }
 
 .table-page--loading .brand {
@@ -739,8 +752,8 @@ button:disabled {
 
 .table-layout {
   display: grid;
-  height: calc(100dvh - 72px);
   min-height: 548px;
+  overflow: hidden;
   grid-template-columns: minmax(0, 1fr) 274px;
 }
 
@@ -1113,6 +1126,10 @@ button:disabled {
   width: 220px;
 }
 
+.player-seat--showdown-revealed {
+  z-index: 25;
+}
+
 .player-seat--folded {
   opacity: 0.48;
   filter: saturate(0.55);
@@ -1127,6 +1144,15 @@ button:disabled {
 .player-seat--busted .seat-bet,
 .player-seat--busted .seat-badges {
   display: none;
+}
+
+.player-seat--busted.player-seat--showdown-revealed {
+  opacity: 1;
+  filter: none;
+}
+
+.player-seat--busted.player-seat--showdown-revealed .player-seat__cards {
+  display: flex;
 }
 
 .player-seat__panel {
@@ -1309,7 +1335,7 @@ button:disabled {
 
 .winner-chip {
   position: absolute;
-  top: -26px;
+  top: calc(100% + 6px);
   left: 50%;
   padding: 4px 9px;
   border: 1px solid rgba(214, 181, 111, 0.35);
@@ -1327,7 +1353,10 @@ button:disabled {
 }
 
 .game-log-wrap {
+  height: 100%;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
   padding: 10px 12px 12px 0;
 }
 
@@ -1366,7 +1395,10 @@ button:disabled {
 }
 
 .game-log__list {
+  min-height: 0;
+  flex: 1 1 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 8px 13px 18px;
   scrollbar-color: #26342d transparent;
   scrollbar-width: thin;

@@ -16,6 +16,7 @@ export interface LocalSetup {
   readonly nickname: string;
   readonly totalPlayers: number;
   readonly difficulty: AiDifficulty;
+  readonly deepSeekEnabled: boolean;
   readonly initialStack: number;
   readonly smallBlind: number;
   readonly bigBlind: number;
@@ -82,7 +83,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       aiDifficulty: setup.difficulty,
       analysisMode: setup.analysisEnabled ? "training" : "off",
     };
-    const transport = new LocalGameTransport({ nickname: setup.nickname, totalPlayers: setup.totalPlayers, settings });
+    const transport = new LocalGameTransport({
+      nickname: setup.nickname,
+      totalPlayers: setup.totalPlayers,
+      settings,
+      deepSeekEnabled: setup.deepSeekEnabled && import.meta.env.VITE_DEEPSEEK_ENABLED === "true",
+      deepSeekModel: (import.meta.env.VITE_DEEPSEEK_MODEL as string | undefined) ?? "deepseek-v4-flash",
+    });
     bindTransport(transport, set);
     set({
       screen: "table",

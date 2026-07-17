@@ -47,6 +47,7 @@ export function PokerTable({ view, locale }: { readonly view: PlayerGameView; re
           position={positions[index] ?? { x: 50, y: 50 }}
           isActing={player.id === view.actingPlayerId}
           isViewer={player.id === view.viewerPlayerId}
+          isShowdownRevealed={view.street === "showdown" && player.cardsVisible}
           wonAmount={wonByPlayer.get(player.id) ?? 0}
         />
       ))}

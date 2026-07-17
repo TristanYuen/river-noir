@@ -48,6 +48,26 @@ npm run verify
 
 静态产物位于 `apps/web/dist`。
 
+## 接入 DeepSeek 对手
+
+将根目录的 `.env.example` 复制到 `apps/web/.env.local`，填写 DeepSeek API Key：
+
+```powershell
+Copy-Item .env.example apps/web/.env.local
+```
+
+```text
+DEEPSEEK_API_KEY=你的_API_Key
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-v4-flash
+```
+
+运行 `npm run dev` 后，可以在单机牌桌设置中选择“本地 AI”或“DeepSeek”。选择 DeepSeek 后，全部 AI 对手都会由 DeepSeek 驱动。每个座位拥有独立姓名、性格与打法，只能看到自己的底牌和公开牌局信息。模型请求失败或动作不合法时，仅在对应角色的当前回合采用本地策略。
+
+API Key 只由 Vite 开发与预览代理读取。部署静态产物时，需要在服务端实现同等的 `/api/deepseek` 反向代理，禁止将 API Key 放入任何 `VITE_` 环境变量。
+
+Vercel 部署已内置 `/api/deepseek/chat/completions` Serverless 代理。请在 Vercel 项目环境变量中配置 `DEEPSEEK_API_KEY`、`DEEPSEEK_BASE_URL` 和 `DEEPSEEK_MODEL`，其中 API Key 只设置在服务端环境。
+
 ## 接入朋友联机
 
 将根目录的 `.env.example` 复制到 `apps/web/.env.local`：

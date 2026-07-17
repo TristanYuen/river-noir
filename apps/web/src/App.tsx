@@ -19,6 +19,7 @@ export function App() {
       nickname: "You",
       totalPlayers,
       difficulty: "standard",
+      deepSeekEnabled: false,
       initialStack: 10_000,
       smallBlind: 50,
       bigBlind: 100,

@@ -17,15 +17,28 @@ import {
   type ServerMessage,
   type TransportStatus,
 } from "@river-noir/protocol";
+import { decideDeepSeekAction } from "./DeepSeekAiClient.js";
 
 export interface LocalGameOptions {
   readonly nickname: string;
   readonly totalPlayers: number;
   readonly settings: RoomSettings;
   readonly aiDelayMs?: number;
+  readonly deepSeekEnabled?: boolean;
+  readonly deepSeekModel?: string;
 }
 
-const AI_NAMES = ["Mira", "Orson", "Sloane", "Jules", "Theo", "Inez", "Rowan", "Noa", "Vale"];
+const AI_PERSONAS = [
+  { name: "Mira", style: "Patient and range-aware. Prefer disciplined value lines and selective bluffs." },
+  { name: "Orson", style: "Loose-aggressive and fearless. Apply pressure while respecting stack and pot odds." },
+  { name: "Sloane", style: "Tight-aggressive and analytical. Enter fewer pots, then play them decisively." },
+  { name: "Jules", style: "Creative and deceptive. Mix bet sizes and look for credible bluffing opportunities." },
+  { name: "Theo", style: "Conservative and resilient. Protect the stack and punish clearly weak ranges." },
+  { name: "Inez", style: "Adaptive and observant. React strongly to recent public betting patterns." },
+  { name: "Rowan", style: "Pressure-oriented tournament player. Use position and stack leverage aggressively." },
+  { name: "Noa", style: "Balanced and difficult to read. Mix strong hands and bluffs with sound frequencies." },
+  { name: "Vale", style: "Unorthodox but rational. Seek unusual profitable lines without ignoring legal bounds." },
+] as const;
 
 class BrowserRandom implements RandomSource {
   next(): number {
@@ -45,6 +58,7 @@ export class LocalGameTransport implements GameTransport {
   private readonly shuffleRandom = new BrowserRandom();
   private readonly aiRandom = new SeededRandom(Date.now());
   private readonly aiPlayerIds: string[];
+  private readonly deepSeekPlayerIds: Set<string>;
   private state: GameState | null = null;
   private connected = false;
   private processingAi = false;
@@ -52,6 +66,7 @@ export class LocalGameTransport implements GameTransport {
   constructor(private readonly options: LocalGameOptions) {
     if (options.totalPlayers < 3 || options.totalPlayers > 10) throw new Error("Local games support 3 to 10 players.");
     this.aiPlayerIds = Array.from({ length: options.totalPlayers - 1 }, (_, index) => `ai-${index + 1}`);
+    this.deepSeekPlayerIds = new Set(options.deepSeekEnabled ? this.aiPlayerIds : []);
   }
 
   async connect(): Promise<void> {
@@ -60,7 +75,13 @@ export class LocalGameTransport implements GameTransport {
     if (!this.state) {
       const players = [
         { id: "hero", name: this.options.nickname.trim() || "Player", seat: 0 },
-        ...this.aiPlayerIds.map((id, index) => ({ id, name: AI_NAMES[index] ?? `AI ${index + 1}`, seat: index + 1 })),
+        ...this.aiPlayerIds.map((id, index) => ({
+          id,
+          name: this.deepSeekPlayerIds.has(id)
+            ? `${AI_PERSONAS[index]?.name ?? `Player ${index + 1}`} · DS`
+            : (AI_PERSONAS[index]?.name ?? `AI ${index + 1}`),
+          seat: index + 1,
+        })),
       ];
       this.state = startHand(createGame({
         tableId: "local-table",
@@ -162,13 +183,28 @@ export class LocalGameTransport implements GameTransport {
         const configuredDelay = this.options.aiDelayMs;
         await delay(configuredDelay ?? 360 + Math.floor(this.aiRandom.next() * 420));
         if (!this.connected || this.state.phase !== "betting") break;
-        const decision = decideAiAction({
+        const fallback = decideAiAction({
           state: this.state,
           playerId: acting.id,
           difficulty: this.options.settings.aiDifficulty,
           random: this.aiRandom,
         });
-        this.state = applyAction(this.state, decision.action);
+        let action = fallback.action;
+        if (this.deepSeekPlayerIds.has(acting.id)) {
+          const persona = AI_PERSONAS[this.aiPlayerIds.indexOf(acting.id)];
+          try {
+            action = await decideDeepSeekAction({
+              state: this.state,
+              playerId: acting.id,
+              fallback,
+              model: this.options.deepSeekModel ?? "deepseek-v4-flash",
+              ...(persona ? { persona } : {}),
+            });
+          } catch (error) {
+            console.warn("DeepSeek action failed; using the local poker strategy for this turn.", error);
+          }
+        }
+        this.state = applyAction(this.state, action);
         this.emitSnapshot();
         safety += 1;
       }

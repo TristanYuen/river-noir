@@ -85,6 +85,17 @@ describe("game engine", () => {
     expect(totalChips(state)).toBe(3_000);
   });
 
+  it("keeps the hand running after only one of three players folds", () => {
+    let state = startHand(game(), fixedRandom);
+    state = act(state, "p0", "fold");
+
+    expect(state.phase).toBe("betting");
+    expect(state.result).toBeNull();
+    expect(state.players.find((player) => player.id === "p0")?.status).toBe("folded");
+    expect(state.players.filter((player) => player.status === "active" || player.status === "allIn")).toHaveLength(2);
+    expect(state.players.find((player) => player.seat === state.actingSeat)?.id).toBe("p1");
+  });
+
   it("returns the uncalled part of an oversized raise before awarding the pot", () => {
     let state = startHand(game(), fixedRandom);
     state = act(state, "p0", "raise", 500);

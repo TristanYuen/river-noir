@@ -10,6 +10,7 @@ interface PlayerSeatProps {
   readonly position: { x: number; y: number };
   readonly isActing: boolean;
   readonly isViewer: boolean;
+  readonly isShowdownRevealed: boolean;
   readonly wonAmount: number;
 }
 
@@ -22,11 +23,11 @@ const statusKey: Record<PublicPlayerView["status"], MessageKey> = {
   busted: "busted",
 };
 
-export function PlayerSeat({ player, locale, position, isActing, isViewer, wonAmount }: PlayerSeatProps) {
+export function PlayerSeat({ player, locale, position, isActing, isViewer, isShowdownRevealed, wonAmount }: PlayerSeatProps) {
   const t = (key: MessageKey, values?: Record<string, string | number>) => translate(locale, key, values);
   const style = { "--seat-x": `${position.x}%`, "--seat-y": `${position.y}%` } as CSSProperties;
   return (
-    <div className={`player-seat${isViewer ? " player-seat--viewer" : ""}${isActing ? " player-seat--acting" : ""}${player.status === "folded" ? " player-seat--folded" : ""}${player.status === "busted" ? " player-seat--busted" : ""}${wonAmount > 0 ? " player-seat--winner" : ""}`} style={style}>
+    <div className={`player-seat${isViewer ? " player-seat--viewer" : ""}${isActing ? " player-seat--acting" : ""}${isShowdownRevealed ? " player-seat--showdown-revealed" : ""}${player.status === "folded" ? " player-seat--folded" : ""}${player.status === "busted" ? " player-seat--busted" : ""}${wonAmount > 0 ? " player-seat--winner" : ""}`} style={style}>
       <div className="player-seat__cards">
         {(player.cardsVisible ? player.cards : [undefined, undefined]).map((card, index) => (
           <PokerCard key={index} card={card} hidden={!player.cardsVisible} compact={!isViewer} />
