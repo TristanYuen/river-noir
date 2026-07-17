@@ -3,6 +3,8 @@ interface RequestLike {
   readonly body?: unknown;
 }
 
+declare const process: { readonly env: Record<string, string | undefined> };
+
 interface ResponseLike {
   status: (code: number) => ResponseLike;
   setHeader: (name: string, value: string) => ResponseLike;
