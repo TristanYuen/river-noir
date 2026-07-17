@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Globe2, History, Volume2, VolumeX, Wifi } from "lucide-react";
 import { Brand } from "./Brand.js";
 import { PokerTable } from "./PokerTable.js";
@@ -28,8 +28,16 @@ export function TablePage() {
   const [analysisPinned, setAnalysisPinned] = useState(false);
   const [mobileLogOpen, setMobileLogOpen] = useState(false);
   const playSound = useGameSound(localSoundEnabled);
+  const lastDealKey = useRef<string | null>(null);
   const analysis = useEquityAnalysis(view, analysisEnabled);
   const t = (key: MessageKey, values?: Record<string, string | number>) => translate(locale, key, values);
+
+  useEffect(() => {
+    if (!view || view.street === "showdown") return;
+    const dealKey = `${view.handNumber}-${view.street}`;
+    if (lastDealKey.current && lastDealKey.current !== dealKey) playSound("deal");
+    lastDealKey.current = dealKey;
+  }, [playSound, view?.handNumber, view?.street]);
 
   if (!view) {
     return <main className="table-page table-page--loading"><Brand /><div className="table-loader"><span /><p>{t("calculating")}</p></div></main>;
@@ -43,12 +51,16 @@ export function TablePage() {
   const winners = [...new Set(winnerAwards.map((award) => award.playerId))]
     .map((id) => view.players.find((player) => player.id === id)?.name)
     .filter((name): name is string => Boolean(name));
+  const fundedPlayers = view.players.filter((player) => player.stack > 0);
+  const tournamentWinner = view.phase === "complete" && fundedPlayers.length === 1 ? fundedPlayers[0] : null;
+  const eliminatedPlayers = view.players.filter((player) => player.status === "busted");
+  const viewerEliminated = eliminatedPlayers.some((player) => player.id === view.viewerPlayerId);
 
   return (
     <main className="table-page">
       <header className="table-header glass-panel">
         <div className="table-header__left">
-          <button className="icon-button icon-button--back" type="button" onClick={() => void leaveTable()} aria-label={t("leaveTable")}><ChevronLeft size={18} /></button>
+          <button className="leave-button" type="button" onClick={() => void leaveTable()} aria-label={t("leaveTable")}><ChevronLeft size={18} /><span>{t("leaveTable")}</span></button>
           <Brand compact />
           <span className="header-divider" />
           <div className="table-meta"><strong>{t(view.street as MessageKey)}</strong><span>{t("hand", { value: view.handNumber })}</span></div>
@@ -65,9 +77,22 @@ export function TablePage() {
         <section className="table-main">
           <PokerTable view={view} locale={locale} />
           {view.phase === "complete" && (
-            <div className="result-banner glass-panel">
-              <div><span>{t("winner")}</span><strong>{winners.join(" · ")}</strong><small>{winnerAwards.length > 0 ? t("wonPot", { value: formatChips(locale, winnerAwards.reduce((sum, award) => sum + award.amount, 0)) }) : ""}</small></div>
-              <button type="button" disabled={busy} onClick={() => { playSound("deal"); void nextHand(); }}>{t("nextHand")}</button>
+            <div className={`result-banner glass-panel${tournamentWinner ? " result-banner--champion" : ""}`}>
+              <div>
+                <span>{t(tournamentWinner ? "tournamentChampion" : "winner")}</span>
+                <strong>{tournamentWinner?.name ?? winners.join(" · ")}</strong>
+                <small>
+                  {tournamentWinner
+                    ? t("tournamentWon", { name: tournamentWinner.name })
+                    : winnerAwards.length > 0
+                      ? t("wonPot", { value: formatChips(locale, winnerAwards.reduce((sum, award) => sum + award.amount, 0)) })
+                      : ""}
+                </small>
+                {!tournamentWinner && eliminatedPlayers.length > 0 && <small className="result-banner__eliminated">{t("eliminatedPlayers", { names: eliminatedPlayers.map((player) => player.name).join("、") })}</small>}
+              </div>
+              <button type="button" disabled={busy} onClick={() => void (tournamentWinner ? leaveTable() : nextHand())}>
+                {t(tournamentWinner ? "returnLobby" : viewerEliminated ? "watchNextHand" : "nextHand")}
+              </button>
             </div>
           )}
           {view.phase === "waiting" && (

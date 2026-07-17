@@ -33,7 +33,7 @@ export function projectGameView(
       cardsVisible,
       cards: cardsVisible ? player.holeCards : [],
       isDealer: player.seat === state.buttonSeat,
-      isSmallBlind: player.seat === state.smallBlindSeat,
+      isSmallBlind: player.seat === state.smallBlindSeat && player.status !== "busted" && player.status !== "sittingOut",
       isBigBlind: player.seat === state.bigBlindSeat,
       isAi: options.aiPlayerIds?.includes(player.id) ?? false,
       connected: !(options.disconnectedPlayerIds?.includes(player.id) ?? false),

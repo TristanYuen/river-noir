@@ -87,7 +87,7 @@ button:disabled {
   transform: rotate(45deg);
   color: var(--gold);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .brand__mark::after {
@@ -111,24 +111,24 @@ button:disabled {
 .brand__name {
   letter-spacing: 0.24em;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .brand__cn {
   margin-top: 3px;
   color: var(--gold-soft);
   letter-spacing: 0.36em;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .brand--compact .brand__mark {
   width: 32px;
   height: 32px;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .brand--compact .brand__name {
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .lobby-shell {
@@ -184,7 +184,7 @@ button:disabled {
   background: rgba(255, 255, 255, 0.025);
   color: #c7d0ca;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   transition: border-color 180ms ease, background 180ms ease;
 }
 
@@ -218,7 +218,7 @@ button:disabled {
   color: var(--gold);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .eyebrow span {
@@ -242,7 +242,7 @@ button:disabled {
   max-width: 590px;
   margin: 0;
   color: #9eaaa3;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.9;
 }
 
@@ -324,7 +324,7 @@ button:disabled {
 }
 
 .table-sculpture__cards i {
-  font-size: 14px;
+  font-size: 16px;
   font-style: normal;
 }
 
@@ -350,7 +350,7 @@ button:disabled {
   align-items: center;
   gap: 8px;
   color: #66736c;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .setup-card {
@@ -381,14 +381,14 @@ button:disabled {
   background: transparent;
   color: #66736c;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .mode-tab em {
   position: absolute;
   top: 3px;
   right: 8px;
-  font-size: 8px;
+  font-size: 11px;
   font-style: normal;
 }
 
@@ -412,7 +412,7 @@ button:disabled {
   flex-direction: column;
   gap: 9px;
   color: #9da9a2;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .field__label-row {
@@ -423,7 +423,7 @@ button:disabled {
 
 .field__label-row strong {
   color: var(--gold);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .field input,
@@ -436,7 +436,7 @@ button:disabled {
   appearance: none;
   background: rgba(0, 0, 0, 0.23);
   color: #e7e3db;
-  font-size: 13px;
+  font-size: 16px;
   transition: border-color 160ms ease, background 160ms ease;
 }
 
@@ -464,7 +464,7 @@ button:disabled {
   background: rgba(0, 0, 0, 0.2);
   color: #76827b;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 14px;
   transition: 160ms ease;
 }
 
@@ -517,7 +517,7 @@ button:disabled {
   border-radius: 9px;
   background: rgba(0, 0, 0, 0.14);
   color: #8e9a93;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .preference-row > div > span {
@@ -568,7 +568,7 @@ button:disabled {
   box-shadow: 0 10px 28px rgba(170, 134, 69, 0.16);
   color: #11130f;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.04em;
   transition: transform 160ms ease, box-shadow 160ms ease;
@@ -606,7 +606,7 @@ button:disabled {
   align-items: center;
   gap: 14px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 15px;
 }
 
 .table-loader span,
@@ -661,14 +661,14 @@ button:disabled {
 
 .table-meta strong {
   color: #dcd9d1;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
 }
 
 .table-meta span,
 .table-header__center {
   color: #718078;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .table-header__center {
@@ -711,13 +711,30 @@ button:disabled {
   color: #d7c394;
 }
 
-.icon-button--back {
-  display: none;
+.leave-button {
+  display: inline-flex;
+  height: 38px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 0 8px;
+  border: 1px solid rgba(214, 181, 111, 0.2);
+  border-radius: 9px;
+  background: rgba(214, 181, 111, 0.055);
+  color: #cbbd9a;
+  cursor: pointer;
+  font-size: 13px;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.leave-button:hover {
+  border-color: rgba(214, 181, 111, 0.46);
+  background: rgba(214, 181, 111, 0.1);
+  color: #f0dfb7;
 }
 
 .language-button--table {
   height: 34px;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .table-layout {
@@ -806,6 +823,125 @@ button:disabled {
   mix-blend-mode: overlay;
 }
 
+.dealer-announcement {
+  position: absolute;
+  z-index: 5;
+  top: 8%;
+  left: 50%;
+  display: grid;
+  width: min(78%, 610px);
+  min-height: 68px;
+  align-items: center;
+  padding: 9px 14px 9px 10px;
+  border: 1px solid rgba(214, 181, 111, 0.2);
+  border-radius: 12px;
+  transform: translateX(-50%);
+  background: linear-gradient(145deg, rgba(10, 26, 19, 0.93), rgba(5, 13, 9, 0.9));
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), inset 0 1px rgba(255, 255, 255, 0.035);
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 10px;
+  animation: dealer-announce 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  backdrop-filter: blur(9px);
+}
+
+@keyframes dealer-announce {
+  from { opacity: 0; transform: translate(-50%, -8px) scale(0.98); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+.dealer-announcement__mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(214, 181, 111, 0.48);
+  border-radius: 50%;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%, #d1b372, #745a31);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
+  color: #10140f;
+  font-family: Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.dealer-announcement__copy {
+  min-width: 0;
+}
+
+.dealer-announcement__copy > span {
+  display: block;
+  margin-bottom: 2px;
+  color: #9b8a65;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dealer-announcement__copy strong {
+  display: block;
+  overflow: hidden;
+  color: #f0e4ca;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.dealer-announcement__copy p {
+  overflow: hidden;
+  margin: 2px 0 0;
+  color: #9ba8a0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.dealer-announcement__turn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #aeb8b2;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dealer-announcement__turn i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6f7c75;
+  box-shadow: 0 0 0 3px rgba(111, 124, 117, 0.1);
+}
+
+.dealer-announcement--your-turn {
+  border-color: rgba(214, 181, 111, 0.48);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.3), 0 0 26px rgba(214, 181, 111, 0.08);
+}
+
+.dealer-announcement--your-turn .dealer-announcement__turn {
+  border-color: rgba(214, 181, 111, 0.3);
+  background: rgba(214, 181, 111, 0.1);
+  color: #eed9a8;
+}
+
+.dealer-announcement--your-turn .dealer-announcement__turn i {
+  background: #e2bf72;
+  box-shadow: 0 0 0 3px rgba(226, 191, 114, 0.15);
+  animation: turn-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes turn-dot {
+  50% { opacity: 0.42; transform: scale(0.75); }
+}
+
+.dealer-announcement--eliminated {
+  border-color: rgba(183, 90, 88, 0.25);
+}
+
 .table-insignia {
   position: absolute;
   top: 67%;
@@ -817,11 +953,11 @@ button:disabled {
   color: rgba(224, 207, 168, 0.11);
   letter-spacing: 0.34em;
   font-family: Georgia, serif;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .table-insignia i {
-  font-size: 15px;
+  font-size: 17px;
   font-style: normal;
 }
 
@@ -841,7 +977,7 @@ button:disabled {
   gap: 9px;
   margin-bottom: 10px;
   color: rgba(221, 225, 219, 0.65);
-  font-size: 9px;
+  font-size: 12px;
   text-transform: uppercase;
 }
 
@@ -850,7 +986,7 @@ button:disabled {
   align-items: center;
   gap: 5px;
   color: #e6d9b7;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -933,7 +1069,7 @@ button:disabled {
   transform: translate(-50%, -50%);
   color: rgba(214, 181, 111, 0.55);
   letter-spacing: 0.1em;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .poker-card--placeholder {
@@ -949,17 +1085,17 @@ button:disabled {
 }
 
 .poker-card--compact .poker-card__rank {
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .poker-card--compact .poker-card__suit {
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .poker-card--compact .poker-card__center-suit {
   right: 4px;
   bottom: 3px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .player-seat {
@@ -967,14 +1103,14 @@ button:disabled {
   z-index: 8;
   top: var(--seat-y);
   left: var(--seat-x);
-  width: 150px;
+  width: 165px;
   transform: translate(-50%, -50%);
   transition: opacity 220ms ease, filter 220ms ease;
 }
 
 .player-seat--viewer {
   z-index: 12;
-  width: 205px;
+  width: 220px;
 }
 
 .player-seat--folded {
@@ -982,10 +1118,21 @@ button:disabled {
   filter: saturate(0.55);
 }
 
+.player-seat--busted {
+  opacity: 0.4;
+  filter: grayscale(0.85) saturate(0.3);
+}
+
+.player-seat--busted .player-seat__cards,
+.player-seat--busted .seat-bet,
+.player-seat--busted .seat-badges {
+  display: none;
+}
+
 .player-seat__panel {
   position: relative;
   display: flex;
-  height: 49px;
+  height: 56px;
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
@@ -996,7 +1143,7 @@ button:disabled {
 }
 
 .player-seat--viewer .player-seat__panel {
-  height: 56px;
+  height: 63px;
   border-color: rgba(214, 181, 111, 0.22);
   background: linear-gradient(145deg, rgba(25, 35, 30, 0.99), rgba(7, 12, 10, 0.99));
 }
@@ -1039,7 +1186,7 @@ button:disabled {
   background: linear-gradient(145deg, #26352e, #101813);
   color: #cfb879;
   font-family: Georgia, serif;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .player-seat--viewer .player-avatar {
@@ -1065,13 +1212,13 @@ button:disabled {
   color: #e7e4dd;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .player-copy span {
   color: #b8a77d;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .seat-status {
@@ -1079,7 +1226,23 @@ button:disabled {
   right: 7px;
   bottom: 3px;
   color: #5e6b64;
-  font-size: 7px;
+  font-size: 11px;
+}
+
+.elimination-stamp {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  right: 9px;
+  padding: 3px 7px;
+  border: 1px solid rgba(183, 90, 88, 0.66);
+  border-radius: 4px;
+  transform: translateY(-50%) rotate(-5deg);
+  background: rgba(54, 18, 17, 0.92);
+  color: #e1a5a2;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
 }
 
 .seat-badges {
@@ -1100,7 +1263,7 @@ button:disabled {
   place-items: center;
   background: #171812;
   color: #e1c681;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -1133,14 +1296,14 @@ button:disabled {
 
 .seat-bet {
   position: absolute;
-  bottom: calc(100% + 49px);
+  bottom: calc(100% + 56px);
   left: 50%;
   display: flex;
   align-items: center;
   gap: 4px;
   transform: translateX(-50%);
   color: #e1d6bb;
-  font-size: 9px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -1154,7 +1317,7 @@ button:disabled {
   transform: translateX(-50%);
   background: #1b1b13;
   color: #efd597;
-  font-size: 8px;
+  font-size: 11px;
   white-space: nowrap;
   animation: winner-enter 380ms ease both;
 }
@@ -1186,7 +1349,7 @@ button:disabled {
   padding: 0 15px;
   border-bottom: 1px solid var(--line);
   color: #bdc5c0;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .panel-heading i {
@@ -1198,7 +1361,7 @@ button:disabled {
   place-items: center;
   background: rgba(255, 255, 255, 0.05);
   color: #6d7972;
-  font-size: 8px;
+  font-size: 11px;
   font-style: normal;
 }
 
@@ -1212,7 +1375,7 @@ button:disabled {
 .game-log__list > p {
   padding: 10px 4px;
   color: #536058;
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1.6;
 }
 
@@ -1241,7 +1404,7 @@ button:disabled {
 .log-entry p {
   margin: 0;
   color: #77837c;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
@@ -1252,7 +1415,7 @@ button:disabled {
   bottom: 14px;
   left: 18px;
   display: flex;
-  min-height: 72px;
+  min-height: 82px;
   align-items: flex-end;
   gap: 16px;
   padding: 10px 12px;
@@ -1282,7 +1445,7 @@ button:disabled {
 
 .raise-control__top > span {
   color: #c5c7c1;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .raise-control__top > div {
@@ -1299,7 +1462,7 @@ button:disabled {
   background: rgba(255, 255, 255, 0.03);
   color: #8b9690;
   cursor: pointer;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .raise-control input {
@@ -1315,15 +1478,15 @@ button:disabled {
 }
 
 .action-button {
-  min-width: 82px;
-  height: 43px;
+  min-width: 88px;
+  height: 48px;
   padding: 0 14px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.045);
   color: #d4d8d4;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
 }
@@ -1376,13 +1539,22 @@ button:disabled {
 .result-banner span,
 .result-banner small {
   color: #748079;
-  font-size: 8px;
+  font-size: 11px;
+}
+
+.result-banner__eliminated {
+  color: #b7817e !important;
+}
+
+.result-banner--champion {
+  border-color: rgba(214, 181, 111, 0.42);
+  box-shadow: 0 20px 65px rgba(0, 0, 0, 0.5), 0 0 42px rgba(214, 181, 111, 0.1);
 }
 
 .result-banner strong {
   color: #e8d5a5;
   font-family: Georgia, serif;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 400;
 }
 
@@ -1394,7 +1566,7 @@ button:disabled {
   background: linear-gradient(145deg, #d0ad64, #97743c);
   color: #10120f;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -1462,7 +1634,7 @@ button:disabled {
   align-items: center;
   gap: 8px;
   color: #c8cfca;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .equity-panel header button {
@@ -1531,7 +1703,7 @@ button:disabled {
 .equity-ring span {
   margin-top: 2px;
   color: #66736c;
-  font-size: 7px;
+  font-size: 11px;
 }
 
 .equity-minor-stats {
@@ -1552,12 +1724,12 @@ button:disabled {
 .equity-minor-stats span,
 .analysis-row span {
   color: #647069;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .equity-minor-stats strong {
   color: #bac3bd;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .analysis-row {
@@ -1573,7 +1745,7 @@ button:disabled {
   max-width: 70%;
   color: #cbd1cc;
   text-align: right;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -1592,14 +1764,14 @@ button:disabled {
 .range-hint strong {
   display: block;
   color: #a69672;
-  font-size: 8px;
+  font-size: 11px;
 }
 
 .range-hint p,
 .analysis-disclaimer {
   margin: 3px 0 0;
   color: #626e67;
-  font-size: 8px;
+  font-size: 11px;
   line-height: 1.5;
 }
 
@@ -1616,7 +1788,7 @@ button:disabled {
   justify-content: center;
   gap: 11px;
   color: #718078;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .error-toast {
@@ -1636,7 +1808,7 @@ button:disabled {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
   color: #e0b4b2;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .error-toast span {
@@ -1659,11 +1831,11 @@ button:disabled {
   }
 
   .player-seat {
-    width: 132px;
+    width: 148px;
   }
 
   .player-seat--viewer {
-    width: 190px;
+    width: 205px;
   }
 
   .action-button {
@@ -1731,10 +1903,6 @@ button:disabled {
     transform: none;
   }
 
-  .icon-button--back {
-    display: grid;
-  }
-
   .table-layout {
     grid-template-columns: 1fr;
   }
@@ -1763,21 +1931,21 @@ button:disabled {
   }
 
   .player-seat {
-    width: 118px;
+    width: 132px;
   }
 
   .player-seat--viewer {
-    width: 175px;
+    width: 195px;
   }
 
   .player-seat__panel {
-    height: 43px;
+    height: 50px;
     padding: 5px;
   }
 
   .player-avatar {
-    width: 27px;
-    height: 27px;
+    width: 30px;
+    height: 30px;
   }
 
   .action-bar {
@@ -1842,6 +2010,17 @@ button:disabled {
     gap: 6px;
   }
 
+  .leave-button {
+    width: 34px;
+    height: 34px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .leave-button span {
+    display: none;
+  }
+
   .table-header__center {
     display: none;
   }
@@ -1891,7 +2070,7 @@ button:disabled {
   }
 
   .poker-stage .player-seat:not(.player-seat--viewer) {
-    width: 92px;
+    width: 100px;
   }
 
   .poker-stage .player-seat:not(.player-seat--viewer) .player-avatar {
@@ -1901,7 +2080,7 @@ button:disabled {
 
   .poker-stage .player-seat:not(.player-seat--viewer) .player-copy strong,
   .poker-stage .player-seat:not(.player-seat--viewer) .player-copy span {
-    font-size: 8px;
+    font-size: 11px;
   }
 
   .poker-stage .player-seat:not(.player-seat--viewer) .seat-status {
@@ -1909,11 +2088,42 @@ button:disabled {
   }
 
   .player-seat--viewer {
-    width: 166px;
+    width: 185px;
   }
 
   .player-seat--viewer .player-seat__panel {
-    height: 51px;
+    height: 57px;
+  }
+
+  .dealer-announcement {
+    top: 3%;
+    width: 90%;
+    min-height: 58px;
+    padding: 7px 9px;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 7px;
+  }
+
+  .dealer-announcement__mark {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .dealer-announcement__copy > span {
+    font-size: 11px;
+  }
+
+  .dealer-announcement__copy strong {
+    font-size: 13px;
+  }
+
+  .dealer-announcement__copy p {
+    font-size: 11px;
+  }
+
+  .dealer-announcement__turn {
+    display: none;
   }
 
   .community-cards {
@@ -1934,9 +2144,9 @@ button:disabled {
   }
 
   .action-button {
-    height: 39px;
+    height: 43px;
     padding: 0 5px;
-    font-size: 9px;
+    font-size: 13px;
   }
 
   .equity-control {

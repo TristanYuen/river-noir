@@ -107,6 +107,7 @@ TypeScript 类型源文件位于 `packages/protocol/src/types.ts`。其他语言
 - 服务端根据 `expectedVersion` 拒绝旧快照产生的操作。
 - 服务端根据 `actionId` 实现幂等；重复提交返回原结果。
 - 服务端必须重新计算合法行动，不能信任客户端按钮状态。
+- 服务端的下注、All-in、边池、淘汰和整场结束判定必须符合 `docs/TOURNAMENT_RULES.md`。
 
 接受命令后发送：
 
@@ -137,6 +138,8 @@ TypeScript 类型源文件位于 `packages/protocol/src/types.ts`。其他语言
 - `version` 在每次有效状态变化后递增。
 - `actionDeadline` 由服务端生成。
 - `recentEvents` 只能包含公开信息。
+- `players[].status` 为 `busted` 时，该玩家已淘汰，后续手牌不得为其发牌或收取盲注。
+- 一手结算后仅剩一名 `stack > 0` 的玩家时，服务器不得接受 `game.nextHand`，当前快照即为整场最终状态。
 - 完整牌堆、烧牌、未公开底牌和服务器随机种子不得出现在快照中。
 
 ## 7. 错误

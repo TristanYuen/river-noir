@@ -50,7 +50,11 @@ npm run verify
 
 ## 接入朋友联机
 
-复制 `.env.example` 为 `.env.local`：
+将根目录的 `.env.example` 复制到 `apps/web/.env.local`：
+
+```powershell
+Copy-Item .env.example apps/web/.env.local
+```
 
 ```text
 VITE_WS_URL=wss://your-domain.example/ws
@@ -63,6 +67,7 @@ VITE_WS_URL=wss://your-domain.example/ws
 - [产品与技术规范](./docs/PRODUCT_SPEC.md)
 - [WebSocket 协议](./docs/WEBSOCKET_PROTOCOL.md)
 - [服务器接入指南](./docs/SERVER_INTEGRATION.md)
+- [锦标赛规则基线](./docs/TOURNAMENT_RULES.md)
 - [构建与部署](./docs/DEPLOYMENT.md)
 - [长期开发日志](./DEVELOPMENT_LOG.md)
 

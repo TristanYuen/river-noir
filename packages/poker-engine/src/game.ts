@@ -142,7 +142,9 @@ function commitChips(player: TablePlayer, requestedAmount: number): { player: Ta
 
 function postBlind(players: readonly TablePlayer[], seat: number, amount: number): { players: TablePlayer[]; posted: number } {
   const player = players.find((candidate) => candidate.seat === seat);
-  if (!player) throw new Error("Blind seat is empty.");
+  if (!player || player.stack <= 0 || player.status === "busted" || player.status === "sittingOut") {
+    return { players: [...players], posted: 0 };
+  }
   const committed = commitChips(player, amount);
   return { players: replacePlayer(players, committed.player), posted: committed.amount };
 }
@@ -193,12 +195,23 @@ export function startHand(state: GameState, random: RandomSource, handId = `${st
     committedHand: 0,
   }));
   const activePlayers = players.filter((player) => eligibleIds.includes(player.id));
-  const buttonSeat = state.buttonSeat === null
-    ? firstSeat(activePlayers, () => true)
-    : nextSeat(activePlayers, state.buttonSeat, () => true);
   const headsUp = activePlayers.length === 2;
-  const smallBlindSeat = headsUp ? buttonSeat : nextSeat(activePlayers, buttonSeat, () => true);
-  const bigBlindSeat = nextSeat(activePlayers, smallBlindSeat, () => true);
+  let buttonSeat: number;
+  let smallBlindSeat: number;
+  let bigBlindSeat: number;
+  if (state.buttonSeat === null || state.bigBlindSeat === null) {
+    buttonSeat = firstSeat(activePlayers, () => true);
+    smallBlindSeat = headsUp ? buttonSeat : nextSeat(activePlayers, buttonSeat, () => true);
+    bigBlindSeat = nextSeat(activePlayers, smallBlindSeat, () => true);
+  } else if (headsUp) {
+    bigBlindSeat = nextSeat(activePlayers, state.bigBlindSeat, () => true);
+    buttonSeat = nextSeat(activePlayers, bigBlindSeat, () => true);
+    smallBlindSeat = buttonSeat;
+  } else {
+    buttonSeat = state.smallBlindSeat ?? (state.buttonSeat + 1) % state.config.maxSeats;
+    smallBlindSeat = state.bigBlindSeat;
+    bigBlindSeat = nextSeat(activePlayers, state.bigBlindSeat, () => true);
+  }
 
   const smallBlind = postBlind(players, smallBlindSeat, state.config.smallBlind);
   players = smallBlind.players;
@@ -216,12 +229,16 @@ export function startHand(state: GameState, random: RandomSource, handId = `${st
     ? buttonSeat
     : nextSeat(players, headsUp ? buttonSeat : bigBlindSeat, (player) => pendingPlayerIds.includes(player.id));
   const currentBet = Math.max(...players.map((player) => player.committedStreet));
-  const events: GameEvent[] = [
-    { type: "handStarted", handId, handNumber: state.handNumber + 1 },
-    { type: "blindPosted", playerId: players.find((player) => player.seat === smallBlindSeat)?.id ?? "", blind: "small", amount: smallBlind.posted },
-    { type: "blindPosted", playerId: players.find((player) => player.seat === bigBlindSeat)?.id ?? "", blind: "big", amount: bigBlind.posted },
-    { type: "cardsDealt" },
-  ];
+  const events: GameEvent[] = [{ type: "handStarted", handId, handNumber: state.handNumber + 1 }];
+  const smallBlindPlayer = players.find((player) => player.seat === smallBlindSeat);
+  if (smallBlindPlayer && smallBlind.posted > 0) {
+    events.push({ type: "blindPosted", playerId: smallBlindPlayer.id, blind: "small", amount: smallBlind.posted });
+  }
+  const bigBlindPlayer = players.find((player) => player.seat === bigBlindSeat);
+  if (bigBlindPlayer && bigBlind.posted > 0) {
+    events.push({ type: "blindPosted", playerId: bigBlindPlayer.id, blind: "big", amount: bigBlind.posted });
+  }
+  events.push({ type: "cardsDealt" });
 
   return normalizeProgress({
     ...state,
@@ -332,9 +349,7 @@ export function applyAction(state: GameState, action: PlayerAction): GameState {
           .filter((candidate) => candidate.id !== player.id && candidate.status === "active" && candidate.stack > 0)
           .map((candidate) => candidate.id),
       );
-      if (oldCurrentBet === 0) {
-        raiseLocked.clear();
-      } else if (fullRaise) {
+      if (fullRaise) {
         minRaise = increment;
         raiseLocked.clear();
       } else {
@@ -348,6 +363,14 @@ export function applyAction(state: GameState, action: PlayerAction): GameState {
   }
 
   players = replacePlayer(players, updatedPlayer);
+  if (currentBet > oldCurrentBet) {
+    for (const lockedPlayerId of [...raiseLocked]) {
+      const lockedPlayer = players.find((candidate) => candidate.id === lockedPlayerId);
+      if (lockedPlayer && currentBet - lockedPlayer.committedStreet >= minRaise) {
+        raiseLocked.delete(lockedPlayerId);
+      }
+    }
+  }
   pending = new Set([...pending].filter((id) => playerById({ ...state, players }, id).status === "active"));
   const amount = action.type === "fold" || action.type === "check" ? 0 : contributed;
   let nextState: GameState = {
@@ -496,9 +519,10 @@ function completeHand(state: GameState, result: HandResult): GameState {
 }
 
 function settleByFold(state: GameState, winnerId: string): GameState {
-  const pots = buildPots(state.players);
+  const settledState = refundUncalledContribution(state);
+  const pots = buildPots(settledState.players);
   const awards = pots.map((pot, potIndex) => ({ potIndex, playerId: winnerId, amount: pot.amount }));
-  return completeHand(state, { reason: "fold", pots, awards });
+  return completeHand(settledState, { reason: "fold", pots, awards });
 }
 
 function settleShowdown(state: GameState): GameState {

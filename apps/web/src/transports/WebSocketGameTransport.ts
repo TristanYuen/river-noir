@@ -11,6 +11,7 @@ export class WebSocketGameTransport implements GameTransport {
   private readonly statusListeners = new Set<(status: TransportStatus) => void>();
   private intentionalClose = false;
   private reconnectAttempt = 0;
+  private reconnectTimer: ReturnType<typeof globalThis.setTimeout> | null = null;
   private shouldResume = false;
   private resumeCommandFactory: (() => ClientCommand | null) | null = null;
 
@@ -51,6 +52,10 @@ export class WebSocketGameTransport implements GameTransport {
 
   async disconnect(): Promise<void> {
     this.intentionalClose = true;
+    if (this.reconnectTimer !== null) {
+      globalThis.clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
     this.socket?.close(1000, "Client left the table");
     this.socket = null;
     this.emitStatus({ status: "offline" });
@@ -80,9 +85,13 @@ export class WebSocketGameTransport implements GameTransport {
   }
 
   private scheduleReconnect(): void {
+    if (this.intentionalClose) return;
     this.reconnectAttempt += 1;
     this.emitStatus({ status: "reconnecting" });
     const wait = Math.min(10_000, 500 * 2 ** Math.min(this.reconnectAttempt, 5));
-    globalThis.setTimeout(() => void this.connect().catch(() => undefined), wait);
+    this.reconnectTimer = globalThis.setTimeout(() => {
+      this.reconnectTimer = null;
+      if (!this.intentionalClose) void this.connect().catch(() => undefined);
+    }, wait);
   }
 }

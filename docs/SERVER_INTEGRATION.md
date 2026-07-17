@@ -4,6 +4,8 @@
 
 前端已经通过 `GameTransport` 隔离本地牌局与远程牌局。服务器开发者需要实现 WebSocket 端点，并遵守 `docs/WEBSOCKET_PROTOCOL.md`。
 
+竞技与下注规则必须遵守 `docs/TOURNAMENT_RULES.md`。Node.js＋TypeScript 服务端优先直接复用共享规则引擎，避免客户端与服务端出现规则分叉。
+
 前端接入只需要在构建环境中设置：
 
 ```text
@@ -46,9 +48,11 @@ interface ServerRoom {
 - Heads-up 盲注与行动顺序。
 - 最小加注和短码 All-in。
 - 未完整加注不重新开放加注权。
+- 多次短码 All-in 累计达到完整加注时重新开放加注权。
 - 主池和多层边池。
 - 平分底池与零散筹码。
 - 未跟注筹码退回。
+- 零筹码玩家淘汰且后续不再发牌；只剩一名有筹码玩家时整场结束。
 - 每手牌筹码守恒。
 
 ## 服务端职责

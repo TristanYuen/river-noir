@@ -109,6 +109,9 @@ export class LocalGameTransport implements GameTransport {
     }
     if (command.type === "game.nextHand" || command.type === "game.start") {
       if (this.state.phase !== "complete" && this.state.phase !== "waiting") throw new Error("The hand is still running.");
+      if (this.state.players.filter((player) => player.stack > 0).length < 2) {
+        throw new Error("The tournament is complete.");
+      }
       this.state = startHand(this.state, this.shuffleRandom);
       this.emitSnapshot();
       await this.runAiTurns();
@@ -158,6 +161,7 @@ export class LocalGameTransport implements GameTransport {
         if (!acting || !this.aiPlayerIds.includes(acting.id)) break;
         const configuredDelay = this.options.aiDelayMs;
         await delay(configuredDelay ?? 360 + Math.floor(this.aiRandom.next() * 420));
+        if (!this.connected || this.state.phase !== "betting") break;
         const decision = decideAiAction({
           state: this.state,
           playerId: acting.id,

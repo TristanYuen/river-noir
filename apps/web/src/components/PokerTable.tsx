@@ -1,6 +1,7 @@
 import type { Locale, PlayerGameView } from "@river-noir/protocol";
 import { PokerCard } from "./PokerCard.js";
 import { PlayerSeat } from "./PlayerSeat.js";
+import { DealerAnnouncement } from "./DealerAnnouncement.js";
 import { formatChips, translate } from "../i18n.js";
 
 export function PokerTable({ view, locale }: { readonly view: PlayerGameView; readonly locale: Locale }) {
@@ -21,6 +22,7 @@ export function PokerTable({ view, locale }: { readonly view: PlayerGameView; re
         <div className="poker-table__rail">
           <div className="poker-table__felt">
             <div className="felt-grain" />
+            <DealerAnnouncement view={view} locale={locale} />
             <div className="table-insignia"><span>RIVER</span><i>♠</i><span>NOIR</span></div>
             <div className="board-zone">
               <div className="pot-display">
