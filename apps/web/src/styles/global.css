@@ -2128,34 +2128,41 @@ button:disabled {
   }
 
   .dealer-announcement {
-    top: 3%;
-    width: 90%;
-    min-height: 58px;
-    padding: 7px 9px;
-    grid-template-columns: 32px minmax(0, 1fr);
-    gap: 7px;
+    top: 4%;
+    width: 82%;
+    min-height: 42px;
+    padding: 5px 8px;
+    border-radius: 9px;
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 6px;
   }
 
   .dealer-announcement__mark {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
   }
 
   .dealer-announcement__copy > span {
-    font-size: 11px;
+    margin-bottom: 1px;
+    font-size: 9px;
   }
 
   .dealer-announcement__copy strong {
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .dealer-announcement__copy p {
-    font-size: 11px;
+    display: none;
   }
 
   .dealer-announcement__turn {
     display: none;
+  }
+
+  .board-zone {
+    z-index: 6;
+    top: 49%;
   }
 
   .community-cards {
