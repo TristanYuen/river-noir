@@ -1,0 +1,29 @@
+{
+  "name": "river-noir",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@11.12.1",
+  "workspaces": [
+    "packages/poker-engine",
+    "packages/poker-equity",
+    "packages/poker-ai",
+    "packages/protocol",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @river-noir/web",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format:text": "node scripts/normalize-text.mjs",
+    "verify": "npm run lint && npm run build && npm run test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "eslint": "^9.31.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.37.0"
+  }
+}
