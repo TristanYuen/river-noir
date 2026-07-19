@@ -7,6 +7,7 @@ import {
   type PlayerAction,
   type PlayerActionType,
 } from "@river-noir/poker-engine";
+import type { DeepSeekDecisionBehavior } from "./DeepSeekBehavior.js";
 
 interface DeepSeekChatResponse {
   readonly choices?: readonly {
@@ -17,6 +18,11 @@ interface DeepSeekChatResponse {
 interface DeepSeekActionResponse {
   readonly action?: unknown;
   readonly amount?: unknown;
+  readonly candidates?: readonly {
+    readonly action?: unknown;
+    readonly amount?: unknown;
+    readonly weight?: unknown;
+  }[];
 }
 
 export interface DeepSeekDecisionOptions {
@@ -24,10 +30,8 @@ export interface DeepSeekDecisionOptions {
   readonly playerId: string;
   readonly fallback: AiDecision;
   readonly model: string;
-  readonly persona?: {
-    readonly name: string;
-    readonly style: string;
-  };
+  readonly behavior?: DeepSeekDecisionBehavior;
+  readonly random?: () => number;
   readonly endpoint?: string;
   readonly timeoutMs?: number;
 }
@@ -48,18 +52,17 @@ function eventSummary(event: GameEvent, state: GameState): Record<string, unknow
   return { type: event.type };
 }
 
-function parseValidatedAction(content: string, state: GameState, playerId: string): PlayerAction {
-  const parsed = JSON.parse(content) as DeepSeekActionResponse;
-  if (typeof parsed.action !== "string" || !ACTION_TYPES.has(parsed.action as PlayerActionType)) {
+function validateAction(candidate: DeepSeekActionResponse, state: GameState, playerId: string): PlayerAction {
+  if (typeof candidate.action !== "string" || !ACTION_TYPES.has(candidate.action as PlayerActionType)) {
     throw new Error("DeepSeek returned an unknown poker action.");
   }
 
-  const actionType = parsed.action as PlayerActionType;
+  const actionType = candidate.action as PlayerActionType;
   const legalAction = getLegalActions(state, playerId).find((action) => action.type === actionType);
   if (!legalAction) throw new Error("DeepSeek returned an action that is not legal in the current state.");
 
   if (actionType === "bet" || actionType === "raise") {
-    const amount = typeof parsed.amount === "number" ? parsed.amount : Number(parsed.amount);
+    const amount = typeof candidate.amount === "number" ? candidate.amount : Number(candidate.amount);
     const minimum = legalAction.minAmount ?? Number.POSITIVE_INFINITY;
     const maximum = legalAction.maxAmount ?? Number.NEGATIVE_INFINITY;
     if (!Number.isInteger(amount) || amount < minimum || amount > maximum) {
@@ -69,6 +72,37 @@ function parseValidatedAction(content: string, state: GameState, playerId: strin
   }
 
   return { playerId, type: actionType };
+}
+
+function parseValidatedPolicy(
+  content: string,
+  state: GameState,
+  playerId: string,
+  random: () => number,
+): PlayerAction {
+  const parsed = JSON.parse(content) as DeepSeekActionResponse;
+  if (!Array.isArray(parsed.candidates) || parsed.candidates.length === 0) {
+    return validateAction(parsed, state, playerId);
+  }
+
+  const candidates = parsed.candidates.flatMap((candidate) => {
+    try {
+      const action = validateAction(candidate, state, playerId);
+      const weight = typeof candidate.weight === "number" ? candidate.weight : Number(candidate.weight);
+      if (!Number.isFinite(weight) || weight <= 0) return [];
+      return [{ action, weight }];
+    } catch {
+      return [];
+    }
+  });
+  if (candidates.length === 0) throw new Error("DeepSeek returned no valid weighted poker actions.");
+  const totalWeight = candidates.reduce((total, candidate) => total + candidate.weight, 0);
+  let cursor = Math.max(0, Math.min(0.999_999, random())) * totalWeight;
+  for (const candidate of candidates) {
+    cursor -= candidate.weight;
+    if (cursor <= 0) return candidate.action;
+  }
+  return candidates[candidates.length - 1]?.action ?? candidates[0]!.action;
 }
 
 export async function decideDeepSeekAction(options: DeepSeekDecisionOptions): Promise<PlayerAction> {
@@ -114,7 +148,9 @@ export async function decideDeepSeekAction(options: DeepSeekDecisionOptions): Pr
       estimatedEquity: Number(fallback.equity.toFixed(4)),
       potOdds: Number(fallback.potOdds.toFixed(4)),
     },
+    dynamicBehavior: options.behavior ?? null,
   };
+  const exploration = options.behavior?.exploration ?? 0.35;
 
   const response = await fetch(options.endpoint ?? "/api/deepseek/chat/completions", {
     method: "POST",
@@ -126,23 +162,22 @@ export async function decideDeepSeekAction(options: DeepSeekDecisionOptions): Pr
         {
           role: "system",
           content: [
-            "You are DeepSeek playing no-limit Texas hold'em with play chips.",
-            options.persona
-              ? `Your independent table identity is ${options.persona.name}. Role-play this style consistently: ${options.persona.style}`
-              : "Play a balanced, observant strategy.",
+            "You are a policy planner for one player in no-limit Texas hold'em with play chips.",
+            "Re-evaluate this decision from scratch. Do not follow a permanent personality or repeat a fixed style.",
+            "dynamicBehavior is a temporary human-like bias derived from recent wins, losses, folds, stack pressure, confidence, and tilt. Let it change frequencies without deliberately making absurd plays.",
             "Do not coordinate with other players or act on behalf of another seat.",
-            "Choose exactly one action from legalActions using only the supplied information.",
+            "Using only the supplied information, produce a mixed policy with 2 to 4 distinct candidate actions from legalActions whenever more than one reasonable line exists.",
             "Never infer hidden opponent cards. Optimize long-run chip value and vary predictable lines when reasonable.",
-            "Return one compact JSON object only. Example JSON: {\"action\":\"raise\",\"amount\":600}.",
-            "For fold, check, call, or allIn, omit amount. For bet or raise, amount must be an integer within minAmount and maxAmount.",
+            "Return one compact JSON object only. Example: {\"candidates\":[{\"action\":\"call\",\"weight\":0.5},{\"action\":\"raise\",\"amount\":600,\"weight\":0.35},{\"action\":\"fold\",\"weight\":0.15}]}.",
+            "Weights must be positive and should sum approximately to 1. For fold, check, call, or allIn, omit amount. For bet or raise, amount must be an integer within minAmount and maxAmount.",
           ].join(" "),
         },
         { role: "user", content: `Poker state JSON:\n${JSON.stringify(visibleState)}` },
       ],
       response_format: { type: "json_object" },
       thinking: { type: "disabled" },
-      temperature: 0.65,
-      max_tokens: 120,
+      temperature: Number(Math.min(1, 0.72 + exploration * 0.3).toFixed(2)),
+      max_tokens: 240,
       stream: false,
     }),
   });
@@ -151,5 +186,5 @@ export async function decideDeepSeekAction(options: DeepSeekDecisionOptions): Pr
   const payload = await response.json() as DeepSeekChatResponse;
   const content = payload.choices?.[0]?.message?.content;
   if (!content) throw new Error("DeepSeek returned an empty response.");
-  return parseValidatedAction(content, state, playerId);
+  return parseValidatedPolicy(content, state, playerId, options.random ?? Math.random);
 }

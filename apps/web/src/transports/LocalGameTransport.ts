@@ -18,6 +18,13 @@ import {
   type TransportStatus,
 } from "@river-noir/protocol";
 import { decideDeepSeekAction } from "./DeepSeekAiClient.js";
+import {
+  behaviorForDecision,
+  createDeepSeekBehavior,
+  recordDeepSeekAction,
+  settleDeepSeekHand,
+  type DeepSeekBehaviorState,
+} from "./DeepSeekBehavior.js";
 
 export interface LocalGameOptions {
   readonly nickname: string;
@@ -28,17 +35,7 @@ export interface LocalGameOptions {
   readonly deepSeekModel?: string;
 }
 
-const AI_PERSONAS = [
-  { name: "Mira", style: "Patient and range-aware. Prefer disciplined value lines and selective bluffs." },
-  { name: "Orson", style: "Loose-aggressive and fearless. Apply pressure while respecting stack and pot odds." },
-  { name: "Sloane", style: "Tight-aggressive and analytical. Enter fewer pots, then play them decisively." },
-  { name: "Jules", style: "Creative and deceptive. Mix bet sizes and look for credible bluffing opportunities." },
-  { name: "Theo", style: "Conservative and resilient. Protect the stack and punish clearly weak ranges." },
-  { name: "Inez", style: "Adaptive and observant. React strongly to recent public betting patterns." },
-  { name: "Rowan", style: "Pressure-oriented tournament player. Use position and stack leverage aggressively." },
-  { name: "Noa", style: "Balanced and difficult to read. Mix strong hands and bluffs with sound frequencies." },
-  { name: "Vale", style: "Unorthodox but rational. Seek unusual profitable lines without ignoring legal bounds." },
-] as const;
+const AI_NAMES = ["Mira", "Orson", "Sloane", "Jules", "Theo", "Inez", "Rowan", "Noa", "Vale"] as const;
 
 class BrowserRandom implements RandomSource {
   next(): number {
@@ -59,6 +56,7 @@ export class LocalGameTransport implements GameTransport {
   private readonly aiRandom = new SeededRandom(Date.now());
   private readonly aiPlayerIds: string[];
   private readonly deepSeekPlayerIds: Set<string>;
+  private readonly deepSeekBehaviors = new Map<string, DeepSeekBehaviorState>();
   private state: GameState | null = null;
   private connected = false;
   private processingAi = false;
@@ -67,6 +65,9 @@ export class LocalGameTransport implements GameTransport {
     if (options.totalPlayers < 3 || options.totalPlayers > 10) throw new Error("Local games support 3 to 10 players.");
     this.aiPlayerIds = Array.from({ length: options.totalPlayers - 1 }, (_, index) => `ai-${index + 1}`);
     this.deepSeekPlayerIds = new Set(options.deepSeekEnabled ? this.aiPlayerIds : []);
+    for (const playerId of this.deepSeekPlayerIds) {
+      this.deepSeekBehaviors.set(playerId, createDeepSeekBehavior(options.settings.initialStack, this.aiRandom));
+    }
   }
 
   async connect(): Promise<void> {
@@ -78,8 +79,8 @@ export class LocalGameTransport implements GameTransport {
         ...this.aiPlayerIds.map((id, index) => ({
           id,
           name: this.deepSeekPlayerIds.has(id)
-            ? `${AI_PERSONAS[index]?.name ?? `Player ${index + 1}`} · DS`
-            : (AI_PERSONAS[index]?.name ?? `AI ${index + 1}`),
+            ? `${AI_NAMES[index] ?? `Player ${index + 1}`} · DS`
+            : (AI_NAMES[index] ?? `AI ${index + 1}`),
           seat: index + 1,
         })),
       ];
@@ -133,6 +134,7 @@ export class LocalGameTransport implements GameTransport {
       if (this.state.players.filter((player) => player.stack > 0).length < 2) {
         throw new Error("The tournament is complete.");
       }
+      if (this.state.phase === "complete") this.settleDeepSeekBehaviors();
       this.state = startHand(this.state, this.shuffleRandom);
       this.emitSnapshot();
       await this.runAiTurns();
@@ -172,6 +174,19 @@ export class LocalGameTransport implements GameTransport {
     });
   }
 
+  private settleDeepSeekBehaviors(): void {
+    if (!this.state) return;
+    for (const playerId of this.deepSeekPlayerIds) {
+      const behavior = this.deepSeekBehaviors.get(playerId);
+      const player = this.state.players.find((candidate) => candidate.id === playerId);
+      if (!behavior || !player) continue;
+      this.deepSeekBehaviors.set(
+        playerId,
+        settleDeepSeekHand(behavior, player.stack, this.state.config.bigBlind, this.aiRandom),
+      );
+    }
+  }
+
   private async runAiTurns(): Promise<void> {
     if (this.processingAi || !this.state) return;
     this.processingAi = true;
@@ -191,17 +206,31 @@ export class LocalGameTransport implements GameTransport {
         });
         let action = fallback.action;
         if (this.deepSeekPlayerIds.has(acting.id)) {
-          const persona = AI_PERSONAS[this.aiPlayerIds.indexOf(acting.id)];
+          const currentBehavior = this.deepSeekBehaviors.get(acting.id);
+          const pot = this.state.players.reduce((total, player) => total + player.committedHand, 0);
+          const behaviorUpdate = currentBehavior
+            ? behaviorForDecision(currentBehavior, {
+                stack: acting.stack,
+                bigBlind: this.state.config.bigBlind,
+                pot,
+              }, this.aiRandom)
+            : null;
+          if (behaviorUpdate) this.deepSeekBehaviors.set(acting.id, behaviorUpdate.state);
           try {
             action = await decideDeepSeekAction({
               state: this.state,
               playerId: acting.id,
               fallback,
               model: this.options.deepSeekModel ?? "deepseek-v4-flash",
-              ...(persona ? { persona } : {}),
+              ...(behaviorUpdate ? { behavior: behaviorUpdate.behavior } : {}),
+              random: () => this.aiRandom.next(),
             });
           } catch (error) {
             console.warn("DeepSeek action failed; using the local poker strategy for this turn.", error);
+          }
+          const latestBehavior = this.deepSeekBehaviors.get(acting.id);
+          if (latestBehavior) {
+            this.deepSeekBehaviors.set(acting.id, recordDeepSeekAction(latestBehavior, action.type));
           }
         }
         this.state = applyAction(this.state, action);

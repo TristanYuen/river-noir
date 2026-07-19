@@ -24,12 +24,13 @@ export function TablePage() {
   const soundEnabled = useGameStore((state) => state.soundEnabled);
   const analysisEnabled = useGameStore((state) => state.analysisEnabled);
   const [localSoundEnabled, setLocalSoundEnabled] = useState(soundEnabled);
+  const [localAnalysisEnabled, setLocalAnalysisEnabled] = useState(analysisEnabled);
   const [analysisOpen, setAnalysisOpen] = useState(false);
   const [analysisPinned, setAnalysisPinned] = useState(false);
   const [mobileLogOpen, setMobileLogOpen] = useState(false);
   const playSound = useGameSound(localSoundEnabled);
   const lastDealKey = useRef<string | null>(null);
-  const analysis = useEquityAnalysis(view, analysisEnabled);
+  const analysis = useEquityAnalysis(view, localAnalysisEnabled);
   const t = (key: MessageKey, values?: Record<string, string | number>) => translate(locale, key, values);
 
   useEffect(() => {
@@ -107,8 +108,10 @@ export function TablePage() {
               view={view}
               locale={locale}
               state={analysis}
+              enabled={localAnalysisEnabled}
               open={analysisOpen}
               pinned={analysisPinned}
+              onEnabledChange={setLocalAnalysisEnabled}
               onOpenChange={setAnalysisOpen}
               onPinnedChange={setAnalysisPinned}
             />

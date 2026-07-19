@@ -179,7 +179,7 @@ export function Lobby() {
 
             <div className="preference-row">
               <div><Volume2 size={17} /><span>{t("sound")}</span><Switch checked={soundEnabled} onChange={setSoundEnabled} label={t("sound")} /></div>
-              <div><Activity size={17} /><span>{t("analysis")}</span><Switch checked={analysisEnabled} onChange={setAnalysisEnabled} label={t("analysis")} /></div>
+              <div><Activity size={17} /><span>{t("autoAnalysis")}</span><Switch checked={analysisEnabled} onChange={setAnalysisEnabled} label={t("autoAnalysis")} /></div>
             </div>
 
             <button className="primary-button" type="submit">
